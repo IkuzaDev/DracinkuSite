@@ -5,50 +5,89 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 env:
-  # Path to the Wails project directory
   WORKING_DIRECTORY: ./
 
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-
-    runs-on: ${{ matrix.os }}
-
+  build-linux:
+    runs-on: ubuntu-22.04
+    
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          check-latest: true
+      
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Install Linux Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            libgtk-3-dev \
+            libwebkit2gtk-4.0-dev \
+            pkg-config
+      
+      - name: Install Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+      
+      - name: Build Application
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: wails build -platform linux/amd64
+      
+      - name: List build output
+        run: ls -la build/bin/
+      
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ApiDracin-linux-amd64
+          path: ./build/bin/*
+          if-no-files-found: warn
 
-    - name: Setup Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: '1.21'
-        check-latest: true
-
-    - name: Setup Node
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18
-
-    - name: Install Wails
-      run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
-
-    - name: Install Linux Dependencies
-      if: runner.os == 'Linux'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev
-
-    - name: Build Application
-      working-directory: ${{ env.WORKING_DIRECTORY }}
-      run: |
-        wails build -platform ${{ matrix.os == 'macOS' && 'darwin/universal' || 'linux/amd64' }}
-
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: ApiDracin-${{ matrix.os }}
-        path: ${{ env.WORKING_DIRECTORY }}/build/bin/*
+  build-macos:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          check-latest: true
+      
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Install Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+      
+      - name: Build Application
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: wails build -platform darwin/universal
+      
+      - name: List build output
+        run: |
+          echo "=== Build contents ==="
+          ls -la build/bin/
+      
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ApiDracin-macos-universal
+          path: ./build/bin/*.app
+          if-no-files-found: warn

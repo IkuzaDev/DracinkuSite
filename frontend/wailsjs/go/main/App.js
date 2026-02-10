@@ -70,8 +70,8 @@ export function RemoveFromLibrary(arg1, arg2) {
   return window['go']['main']['App']['RemoveFromLibrary'](arg1, arg2);
 }
 
-export function SearchSeries(arg1, arg2, arg3) {
-  return window['go']['main']['App']['SearchSeries'](arg1, arg2, arg3);
+export function SearchSeries(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['main']['App']['SearchSeries'](arg1, arg2, arg3, arg4, arg5);
 }
 
 export function SelectDownloadFolder() {

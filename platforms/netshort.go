@@ -489,16 +489,16 @@ func (n *NetShort) GetSeriesDetail(videoID string, language string) (*models.Ser
 	return &models.SeriesDetailResponse{Book: &book, Chapters: chapters}, nil
 }
 
-func (n *NetShort) SearchSeries(keyword, language string) (*models.SearchResponse, error) {
-	fmt.Printf("[NetShort] SearchSeries called with keyword: %s\n", keyword)
+func (n *NetShort) SearchSeries(keyword string, pageNo, pageSize int, language string) (*models.SearchResponse, error) {
+	fmt.Printf("[NetShort] SearchSeries called with keyword: %s, page: %d\n", keyword, pageNo)
 	if language != "" {
 		n.SetLanguage(language)
 	}
 
 	result, err := n.request("/video/shortPlay/search/searchByKeyword", map[string]interface{}{
 		"searchFlag": 0,
-		"pageNo":     1,
-		"pageSize":   20,
+		"pageNo":     pageNo,
+		"pageSize":   pageSize,
 		"searchCode": keyword,
 	})
 	if err != nil {

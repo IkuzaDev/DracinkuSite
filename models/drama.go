@@ -95,9 +95,9 @@ type SeriesDetailResponse struct {
 }
 
 type SearchResponse struct {
-	IsMore   bool        `json:"isMore"`
+	IsMore   bool        `json:"isMore,omitempty"`
 	Book     []DramaItem `json:"book"`
-	PageInfo PageInfo    `json:"page_info"`
+	PageInfo PageInfo    `json:"page_info,omitempty"`
 }
 
 type DramaListResponse struct {

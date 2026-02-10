@@ -242,27 +242,35 @@ func (a *App) GetSeriesDetail(platform string, seriesID interface{}, quality int
 	return result, err
 }
 
-func (a *App) SearchSeries(platform, keyword string, language string) (*models.SearchResponse, error) {
+func (a *App) SearchSeries(platform, keyword string, page, limit int, language string) (*models.SearchResponse, error) {
 	var result *models.SearchResponse
 	var err error
 
+	// Default values if 0
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 {
+		limit = 20
+	}
+
 	switch platform {
 	case "dramabox":
-		result, err = a.dramabox.SearchSeries(keyword, 1, 20, language)
+		result, err = a.dramabox.SearchSeries(keyword, page, limit, language)
 	case "dramadash":
-		result, err = a.dramadash.SearchSeries(keyword, 1, 20, language)
+		result, err = a.dramadash.SearchSeries(keyword, page, limit, language)
 	case "flickreels":
-		result, err = a.flickreels.SearchSeries(keyword, 1, 20, language)
+		result, err = a.flickreels.SearchSeries(keyword, page, limit, language)
 	case "freereels":
-		result, err = a.freereels.SearchSeries(keyword, 1, 20, language)
+		result, err = a.freereels.SearchSeries(keyword, page, limit, language)
 	case "gooshort":
-		result, err = a.gooshort.SearchSeries(keyword, 1, 20, language)
+		result, err = a.gooshort.SearchSeries(keyword, page, limit, language)
 	case "melolo":
-		result, err = a.melolo.SearchSeries(keyword, 1, 20, language)
+		result, err = a.melolo.SearchSeries(keyword, page, limit, language)
 	case "netshort":
-		result, err = a.netshort.SearchSeries(keyword, language)
+		result, err = a.netshort.SearchSeries(keyword, page, limit, language)
 	case "shortmax":
-		result, err = a.shortmax.SearchSeries(keyword, 1, 20, language)
+		result, err = a.shortmax.SearchSeries(keyword, page, limit, language)
 	default:
 		return nil, fmt.Errorf("unknown platform: %s", platform)
 	}

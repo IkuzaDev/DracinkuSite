@@ -150,14 +150,15 @@ func (c *WrapperClient) Request(endpoint, method string, query map[string]string
 	if body != nil {
 		reqBody, err = json.Marshal(body)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("marshal request body: %w", err)
 		}
 	}
 
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(reqBody))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create request: %w", err)
 	}
+
 	req.Header.Set("x-api-key", GlobalLicenseKey)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -172,24 +173,35 @@ func (c *WrapperClient) Request(endpoint, method string, query map[string]string
 
 	resp, err := c.HttpClient.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("send request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	respData, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("read response: %w", err)
+	}
+
+	// Log response for debugging
+	fmt.Printf("[%sWrapper] Response Status: %d, Body: %s\n", c.Platform, resp.StatusCode, string(respData))
+
+	// Check HTTP status code
+	if resp.StatusCode >= 400 {
+		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(respData))
 	}
 
 	var wrapperResp WrapperResponse
 	if err := json.Unmarshal(respData, &wrapperResp); err != nil {
-		return nil, fmt.Errorf("API Error: %v. Status: %d. Body: %s", err, resp.StatusCode, string(respData))
+		return nil, fmt.Errorf("unmarshal wrapper response: %w. Body: %s", err, string(respData))
 	}
 
 	if !wrapperResp.Success {
 		if wrapperResp.Error != nil {
 			// Check for license errors
-			if wrapperResp.Error.Code == "INVALID_LICENSE_KEY" || wrapperResp.Error.Code == "LICENSE_EXPIRED" || wrapperResp.Error.Code == "INVALID_API_KEY" || wrapperResp.Error.Code == "API_KEY_EXPIRED" {
+			if wrapperResp.Error.Code == "INVALID_LICENSE_KEY" ||
+				wrapperResp.Error.Code == "LICENSE_EXPIRED" ||
+				wrapperResp.Error.Code == "INVALID_API_KEY" ||
+				wrapperResp.Error.Code == "API_KEY_EXPIRED" {
 				return nil, fmt.Errorf("LICENSE_ERROR: %s", wrapperResp.Error.Message)
 			}
 			return nil, fmt.Errorf("api error: %s (%s)", wrapperResp.Error.Message, wrapperResp.Error.Code)

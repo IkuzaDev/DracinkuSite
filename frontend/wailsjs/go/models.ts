@@ -273,9 +273,9 @@ export namespace models {
 	    }
 	}
 	export class SearchResponse {
-	    isMore: boolean;
+	    isMore?: boolean;
 	    book: DramaItem[];
-	    page_info: PageInfo;
+	    page_info?: PageInfo;
 	
 	    static createFrom(source: any = {}) {
 	        return new SearchResponse(source);

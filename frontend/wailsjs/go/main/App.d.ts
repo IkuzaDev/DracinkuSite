@@ -37,7 +37,7 @@ export function GetTabList(arg1:string,arg2:string):Promise<Array<models.TabItem
 
 export function RemoveFromLibrary(arg1:string,arg2:boolean):Promise<void>;
 
-export function SearchSeries(arg1:string,arg2:string,arg3:string):Promise<models.SearchResponse>;
+export function SearchSeries(arg1:string,arg2:string,arg3:number,arg4:number,arg5:string):Promise<models.SearchResponse>;
 
 export function SelectDownloadFolder():Promise<string>;
 
