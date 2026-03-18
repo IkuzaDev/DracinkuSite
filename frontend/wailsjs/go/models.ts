@@ -242,6 +242,8 @@ export namespace models {
 	    pageSize?: number;
 	    tabKey?: any;
 	    positionIndex?: any;
+	    tab_key?: any;
+	    position_index?: any;
 	    next?: any;
 	    current?: number;
 	    total?: number;
@@ -262,6 +264,8 @@ export namespace models {
 	        this.pageSize = source["pageSize"];
 	        this.tabKey = source["tabKey"];
 	        this.positionIndex = source["positionIndex"];
+	        this.tab_key = source["tab_key"];
+	        this.position_index = source["position_index"];
 	        this.next = source["next"];
 	        this.current = source["current"];
 	        this.total = source["total"];

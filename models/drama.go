@@ -33,6 +33,8 @@ type PageInfo struct {
 	PageSize      int    `json:"pageSize,omitempty"`
 	TabKey        any    `json:"tabKey,omitempty"`
 	PositionIndex any    `json:"positionIndex,omitempty"`
+	TabKey2       any    `json:"tab_key,omitempty"`
+	PositionIndex2 any   `json:"position_index,omitempty"`
 	Next          any    `json:"next,omitempty"`
 	Current       int    `json:"current,omitempty"`
 	Total         int    `json:"total,omitempty"`
