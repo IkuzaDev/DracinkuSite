@@ -20,11 +20,23 @@ type App struct {
 	dramabox        *platforms.Dramabox
 	dramadash       *platforms.DramaDash
 	flickreels      *platforms.FlickReels
+	flickshort      *platforms.FlickShort
 	freereels       *platforms.FreeReels
-	gooshort        *platforms.GooShort
+	goodshort        *platforms.GoodShort
 	melolo          *platforms.Melolo
 	netshort        *platforms.NetShort
 	shortmax        *platforms.ShortMax
+	reelbuzz        *platforms.ReelBuzz
+	dramamax        *platforms.DramaMax
+	anime           *platforms.Anime
+	movie           *platforms.Movie
+	tv              *platforms.TV
+	radreels        *platforms.RadReels
+	hishort         *platforms.HiShort
+	dramawave       *platforms.DramaWave
+	jav             *platforms.Jav
+	drakor          *platforms.Drakor
+	animev2         *platforms.AnimeV2
 	downloadManager *DownloadManager
 	library         *Library
 	seriesCache     *SeriesCache
@@ -42,11 +54,23 @@ func NewApp() *App {
 		dramabox:        platforms.NewDramabox("id"),
 		dramadash:       platforms.NewDramaDash("id"),
 		flickreels:      platforms.NewFlickReels("id-ID"),
+		flickshort:      platforms.NewFlickShort("in"),
 		freereels:       platforms.NewFreeReels("id-ID"),
-		gooshort:        platforms.NewGooShort("in"),
+		goodshort:        platforms.NewGoodShort("in"),
 		melolo:          platforms.NewMelolo("id"),
 		netshort:        platforms.NewNetShort("id_ID"),
 		shortmax:        platforms.NewShortMax("id"),
+		reelbuzz:        platforms.NewReelBuzz("in"),
+		dramamax:        platforms.NewDramaMax("id"),
+		anime:           platforms.NewAnime("id"),
+		movie:           platforms.NewMovie("id"),
+		tv:              platforms.NewTV("id"),
+		radreels:        platforms.NewRadReels("in"),
+		hishort:         platforms.NewHiShort("id"),
+		dramawave:       platforms.NewDramaWave("id_ID"),
+		jav:             platforms.NewJav("id"),
+		drakor:          platforms.NewDrakor("id"),
+		animev2:         platforms.NewAnimeV2("id"),
 		downloadManager: NewDownloadManager(),
 		library:         NewLibrary(),
 		seriesCache:     NewSeriesCache(),
@@ -146,10 +170,22 @@ func (a *App) GetPlatformList() []PlatformInfo {
 		{ID: "dramadash", Name: "DramaDash"},
 		{ID: "flickreels", Name: "FlickReels"},
 		{ID: "freereels", Name: "FreeReels"},
-		{ID: "gooshort", Name: "GooShort"},
+		{ID: "flickshort", Name: "FlickShort"},
+		{ID: "goodshort", Name: "GoodShort"},
 		{ID: "melolo", Name: "Melolo"},
 		{ID: "netshort", Name: "NetShort"},
 		{ID: "shortmax", Name: "ShortMax"},
+		{ID: "reelbuzz", Name: "ReelBuzz"},
+		{ID: "dramamax", Name: "DramaMax"},
+		{ID: "anime", Name: "Anime"},
+		{ID: "movie", Name: "Movie"},
+		{ID: "tv", Name: "TV"},
+		{ID: "radreels", Name: "RadReels"},
+		{ID: "hishort", Name: "HiShort"},
+		{ID: "dramawave", Name: "DramaWave"},
+		{ID: "bjav", Name: "Jav"},
+		{ID: "drakor", Name: "Drakor"},
+		{ID: "animev2", Name: "AnimeV2"},
 	}
 }
 
@@ -174,14 +210,38 @@ func (a *App) GetTabList(platform, language string) ([]models.TabItem, error) {
 		list, err = a.flickreels.GetTabList(language)
 	case "freereels":
 		list, err = a.freereels.GetTabList(language)
-	case "gooshort":
-		list, err = a.gooshort.GetTabList(language)
+	case "flickshort":
+		list, err = a.flickshort.GetTabList(language)
+	case "goodshort":
+		list, err = a.goodshort.GetTabList(language)
 	case "melolo":
 		list, err = a.melolo.GetTabList(language)
 	case "netshort":
 		list, err = a.netshort.GetTabList(language)
 	case "shortmax":
 		list, err = a.shortmax.GetTabList(language)
+	case "reelbuzz":
+		list, err = a.reelbuzz.GetTabList(language)
+	case "dramamax":
+		list, err = a.dramamax.GetTabList(language)
+	case "anime":
+		list, err = a.anime.GetTabList(language)
+	case "movie":
+		list, err = a.movie.GetTabList(language)
+	case "tv":
+		list, err = a.tv.GetTabList(language)
+	case "radreels":
+		list, err = a.radreels.GetTabList(language)
+	case "hishort":
+		list, err = a.hishort.GetTabList(language)
+	case "dramawave":
+		list, err = a.dramawave.GetTabList(language)
+	case "bjav":
+		list, err = a.jav.GetTabList(language)
+	case "drakor":
+		list, err = a.drakor.GetTabList(language)
+	case "animev2":
+		list, err = a.animev2.GetTabList(language)
 	default:
 		return nil, fmt.Errorf("unknown platform: %s", platform)
 	}
@@ -217,14 +277,38 @@ func (a *App) GetSeriesDetail(platform string, seriesID interface{}, quality int
 		result, err = a.flickreels.GetSeriesDetail(sid, quality, language)
 	case "freereels":
 		result, err = a.freereels.GetSeriesDetail(sid, quality, language)
-	case "gooshort":
-		result, err = a.gooshort.GetSeriesDetail(sid, quality, language)
+	case "flickshort":
+		result, err = a.flickshort.GetSeriesDetail(sid, quality, language)
+	case "goodshort":
+		result, err = a.goodshort.GetSeriesDetail(sid, quality, language)
 	case "melolo":
 		result, err = a.melolo.GetSeriesDetail(sid, quality, language)
 	case "netshort":
 		result, err = a.netshort.GetSeriesDetail(sid, language)
 	case "shortmax":
 		result, err = a.shortmax.GetSeriesDetail(sid, quality, language)
+	case "reelbuzz":
+		result, err = a.reelbuzz.GetSeriesDetail(sid, quality, language)
+	case "dramamax":
+		result, err = a.dramamax.GetSeriesDetail(sid, quality, language)
+	case "anime":
+		result, err = a.anime.GetSeriesDetail(sid, quality, language)
+	case "movie":
+		result, err = a.movie.GetSeriesDetail(sid, quality, language)
+	case "tv":
+		result, err = a.tv.GetSeriesDetail(sid, quality, language)
+	case "radreels":
+		result, err = a.radreels.GetSeriesDetail(sid, quality, language)
+	case "hishort":
+		result, err = a.hishort.GetSeriesDetail(sid, quality, language)
+	case "dramawave":
+		result, err = a.dramawave.GetSeriesDetail(sid, quality, language)
+	case "bjav":
+		result, err = a.jav.GetSeriesDetail(sid, quality, language)
+	case "drakor":
+		result, err = a.drakor.GetSeriesDetail(sid, quality, language)
+	case "animev2":
+		result, err = a.animev2.GetSeriesDetail(sid, quality, language)
 	default:
 		return nil, fmt.Errorf("unknown platform: %s", platform)
 	}
@@ -263,14 +347,38 @@ func (a *App) SearchSeries(platform, keyword string, page, limit int, language s
 		result, err = a.flickreels.SearchSeries(keyword, page, limit, language)
 	case "freereels":
 		result, err = a.freereels.SearchSeries(keyword, page, limit, language)
-	case "gooshort":
-		result, err = a.gooshort.SearchSeries(keyword, page, limit, language)
+	case "flickshort":
+		result, err = a.flickshort.SearchSeries(keyword, page, limit, language)
+	case "goodshort":
+		result, err = a.goodshort.SearchSeries(keyword, page, limit, language)
 	case "melolo":
 		result, err = a.melolo.SearchSeries(keyword, page, limit, language)
 	case "netshort":
 		result, err = a.netshort.SearchSeries(keyword, page, limit, language)
 	case "shortmax":
 		result, err = a.shortmax.SearchSeries(keyword, page, limit, language)
+	case "reelbuzz":
+		result, err = a.reelbuzz.SearchSeries(keyword, page, limit, language)
+	case "dramamax":
+		result, err = a.dramamax.SearchSeries(keyword, page, limit, language)
+	case "anime":
+		result, err = a.anime.SearchSeries(keyword, page, limit, language)
+	case "movie":
+		result, err = a.movie.SearchSeries(keyword, page, limit, language)
+	case "tv":
+		result, err = a.tv.SearchSeries(keyword, page, limit, language)
+	case "radreels":
+		result, err = a.radreels.SearchSeries(keyword, page, limit, language)
+	case "hishort":
+		result, err = a.hishort.SearchSeries(keyword, page, limit, language)
+	case "dramawave":
+		result, err = a.dramawave.SearchSeries(keyword, page, limit, language)
+	case "bjav":
+		result, err = a.jav.SearchSeries(keyword, page, limit, language)
+	case "drakor":
+		result, err = a.drakor.SearchSeries(keyword, page, limit, language)
+	case "animev2":
+		result, err = a.animev2.SearchSeries(keyword, page, limit, language)
 	default:
 		return nil, fmt.Errorf("unknown platform: %s", platform)
 	}
@@ -315,14 +423,38 @@ func (a *App) GetTabData(platform string, tabType string, tabKey interface{}, po
 		return a.flickreels.GetTabData(tabType, tabKey, positionIndex, language)
 	case "freereels":
 		return a.freereels.GetTabData(tabType, tabKey, positionIndex, language)
-	case "gooshort":
-		return a.gooshort.GetTabData(tabType, tabKey, positionIndex, language)
+	case "flickshort":
+		return a.flickshort.GetTabData(tabType, tabKey, positionIndex, language)
+	case "goodshort":
+		return a.goodshort.GetTabData(tabType, tabKey, positionIndex, language)
 	case "melolo":
 		return a.melolo.GetTabData(tabType, tabKey, positionIndex, language)
 	case "netshort":
 		return a.netshort.GetTabData(tabType, tabKey, positionIndex, language)
 	case "shortmax":
 		return a.shortmax.GetTabData(tabType, tabKey, positionIndex, language)
+	case "reelbuzz":
+		return a.reelbuzz.GetTabData(tabType, tabKey, positionIndex, language)
+	case "dramamax":
+		return a.dramamax.GetTabData(tabType, tabKey, positionIndex, language)
+	case "anime":
+		return a.anime.GetTabData(tabType, tabKey, positionIndex, language)
+	case "movie":
+		return a.movie.GetTabData(tabType, tabKey, positionIndex, language)
+	case "tv":
+		return a.tv.GetTabData(tabType, tabKey, positionIndex, language)
+	case "radreels":
+		return a.radreels.GetTabData(tabType, tabKey, positionIndex, language)
+	case "hishort":
+		return a.hishort.GetTabData(tabType, tabKey, positionIndex, language)
+	case "dramawave":
+		return a.dramawave.GetTabData(tabType, tabKey, positionIndex, language)
+	case "bjav":
+		return a.jav.GetTabData(tabType, tabKey, positionIndex, language)
+	case "drakor":
+		return a.drakor.GetTabData(tabType, tabKey, positionIndex, language)
+	case "animev2":
+		return a.animev2.GetTabData(tabType, tabKey, positionIndex, language)
 	default:
 		return nil, fmt.Errorf("unknown platform: %s", platform)
 	}
@@ -341,14 +473,38 @@ func (a *App) GetTabFeed(platform string, pageInfo models.PageInfo, language str
 		result, err = a.flickreels.GetTabFeed(pageInfo, language)
 	case "freereels":
 		result, err = a.freereels.GetTabFeed(pageInfo, language)
-	case "gooshort":
-		result, err = a.gooshort.GetTabFeed(pageInfo, language)
+	case "flickshort":
+		result, err = a.flickshort.GetTabFeed(pageInfo, language)
+	case "goodshort":
+		result, err = a.goodshort.GetTabFeed(pageInfo, language)
 	case "melolo":
 		result, err = a.melolo.GetTabFeed(pageInfo, language)
 	case "netshort":
 		result, err = a.netshort.GetTabFeed(pageInfo, language)
 	case "shortmax":
 		result, err = a.shortmax.GetTabFeed(pageInfo, language)
+	case "reelbuzz":
+		result, err = a.reelbuzz.GetTabFeed(pageInfo, language)
+	case "dramamax":
+		result, err = a.dramamax.GetTabFeed(pageInfo, language)
+	case "anime":
+		result, err = a.anime.GetTabFeed(pageInfo, language)
+	case "movie":
+		result, err = a.movie.GetTabFeed(pageInfo, language)
+	case "tv":
+		result, err = a.tv.GetTabFeed(pageInfo, language)
+	case "radreels":
+		result, err = a.radreels.GetTabFeed(pageInfo, language)
+	case "hishort":
+		result, err = a.hishort.GetTabFeed(pageInfo, language)
+	case "dramawave":
+		result, err = a.dramawave.GetTabFeed(pageInfo, language)
+	case "bjav":
+		result, err = a.jav.GetTabFeed(pageInfo, language)
+	case "drakor":
+		result, err = a.drakor.GetTabFeed(pageInfo, language)
+	case "animev2":
+		result, err = a.animev2.GetTabFeed(pageInfo, language)
 	default:
 		return nil, fmt.Errorf("unknown platform: %s", platform)
 	}

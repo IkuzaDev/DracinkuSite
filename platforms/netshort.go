@@ -516,7 +516,20 @@ func (n *NetShort) SearchSeries(keyword string, pageNo, pageSize int, language s
 		items = append(items, n.transformItem(item.(map[string]interface{})))
 	}
 
-	return &models.SearchResponse{IsMore: false, Book: items, PageInfo: models.PageInfo{HasMore: false}}, nil
+	// Check if there are more results by comparing page size with results count
+	isMore := len(items) >= pageSize
+	hasMore := isMore
+
+	return &models.SearchResponse{
+		IsMore: isMore, 
+		Book: items, 
+		PageInfo: models.PageInfo{
+			HasMore:  hasMore,
+			PageNo:   pageNo,
+			PageSize: pageSize,
+			Next:     pageNo + 1,
+		},
+	}, nil
 }
 
 func (n *NetShort) buildFilterBody(params map[string]interface{}) (map[string]interface{}, error) {
@@ -744,17 +757,23 @@ func (n *NetShort) filterDrama(tagId string, orderMode string, regionKey, audioK
 		}
 	}
 
-	maxOffset := 0
+	maxOffset := offset
 	if v, ok := data["maxOffset"].(float64); ok {
 		maxOffset = int(v)
 	}
 
-	completed := false
+	completed := true
 	if v, ok := data["completed"].(bool); ok {
 		completed = v
 	}
 
-	return list, maxOffset, !completed, nil
+	// Better pagination logic: if we got a full page, there might be more
+	hasMore := !completed && len(list) >= limit
+	if maxOffset > offset {
+		hasMore = true
+	}
+
+	return list, maxOffset, hasMore, nil
 }
 
 func (n *NetShort) GetTabData(tabType string, tabKey interface{}, positionIndex interface{}, language string) (*models.TabDataResponse, error) {

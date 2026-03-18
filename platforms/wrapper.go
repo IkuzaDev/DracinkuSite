@@ -46,24 +46,10 @@ func NewWrapperClient(platform, language string) *WrapperClient {
 }
 
 func (c *WrapperClient) SetLanguage(language string) {
-	// Map generic language code to platform-specific code
-	// Default to original if not found
 	code := language
 
 	switch c.Platform {
-	case "dramabox", "shortmax", "melolo", "dramadash":
-		// id, en, th, vi, zh, kr, jp
-		// Remap ko -> kr, ja -> jp, zhtw/zhcn -> zh
-		switch language {
-		case "ko":
-			code = "kr"
-		case "ja":
-			code = "jp"
-		case "zhtw", "zhcn":
-			code = "zh"
-		}
-	case "gooshort":
-		// id -> in
+	case "dramabox", "goodshort", "reelbuzz", "radreels":
 		switch language {
 		case "id":
 			code = "in"
@@ -74,8 +60,26 @@ func (c *WrapperClient) SetLanguage(language string) {
 		case "zhtw", "zhcn":
 			code = "zh"
 		}
-	case "netshort":
-		// id_ID, en_US, th_TH, vi_VN, zh_CN, kr_KR, jp_JP
+
+	case "shortmax", "hishort", "melolo", "dramadash", "flickshort":
+		switch language {
+		case "ko":
+			code = "kr"
+		case "ja":
+			code = "jp"
+		case "zhtw", "zhcn":
+			code = "zh"
+		}
+
+	case "dramamax":
+		switch language {
+		case "ja":
+			code = "jp"
+		case "zhtw", "zhcn":
+			code = "zn"
+		}
+
+	case "netshort", "freereels", "dramawave":
 		switch language {
 		case "id":
 			code = "id_ID"
@@ -85,52 +89,34 @@ func (c *WrapperClient) SetLanguage(language string) {
 			code = "th_TH"
 		case "vi":
 			code = "vi_VN"
-		case "zh", "zhcn":
-			code = "zh_CN"
-		case "zhtw":
-			code = "zh_TW" // or zh_CN default? User map says zh_CN for zh.
 		case "ko":
 			code = "kr_KR"
 		case "ja":
 			code = "jp_JP"
+		case "zhtw", "zhcn":
+			code = "zh_CN"
 		}
-	case "flickreels", "freereels":
-		// id-ID, en-US, th-TH, vi-VN, zh-CN, kr-KR, jp-JP
-		// Flickreels specific: kr=ko-KR, jp=ja-JP?
-		// User map says:
-		// freereels: kr-KR, jp-JP
-		// flickreels: kr=ko-KR, jp=ja-JP
-		if c.Platform == "flickreels" {
-			switch language {
-			case "id":
-				code = "id-ID"
-			case "en":
-				code = "en-US"
-			case "th":
-				code = "th-TH"
-			case "ko":
-				code = "ko-KR"
-			case "ja":
-				code = "ja-JP"
-			}
-		} else { // freereels
-			switch language {
-			case "id":
-				code = "id-ID"
-			case "en":
-				code = "en-US"
-			case "th":
-				code = "th-TH"
-			case "vi":
-				code = "vi-VN"
-			case "zh", "zhcn":
-				code = "zh-CN"
-			case "ko":
-				code = "kr-KR"
-			case "ja":
-				code = "jp-JP"
-			}
+
+	case "flickreels":
+		switch language {
+		case "id":
+			code = "id_ID"
+		case "en":
+			code = "en_US"
+		case "th":
+			code = "th_TH"
+		case "vi":
+			code = "vi_VN"
+		case "ko":
+			code = "ko_KR"
+		case "ja":
+			code = "ja_JP"
+		case "zhtw", "zhcn":
+			code = "zh_CN"
 		}
+
+	case "drakor", "animev2":
+		code = "id"
 	}
 
 	c.Language = code
@@ -245,35 +231,41 @@ func (c *WrapperClient) GetTabData(tabType string, tabKey interface{}, positionI
 }
 
 func (c *WrapperClient) GetTabFeed(pageInfo models.PageInfo) (*models.TabFeedResponse, error) {
-	data, err := c.Request("/tabfeed", "POST", nil, pageInfo) // pageInfo matches structure expected by API
+	data, err := c.Request("/tabfeed", "POST", nil, pageInfo)
 	if err != nil {
 		return nil, err
 	}
 
-	// API returns same structure as TabData often, but let's see.
-	// API.md says "Get next page of tab content". Response example not explicitly shown but implied to be similar.
-	// Actually typical paged response.
-	// Let's assume it parses into TabFeedResponse which is essentially List + PageInfo
+	// Try to parse as TabFeedResponse first (direct array format)
 	var resp models.TabFeedResponse
-	// Sometimes it might return full Book object wrapper. Check API.md
-	// API.md doesn't explicitly show TabFeed response. Assuming similar to TabData but maybe different root.
-	// Actually, usually TabFeed returns just the list and new page info.
-	// Struct models.TabFeedResponse has IsMore, Book []DramaItem, PageInfo.
-	// Let's try to unmarshal into that.
-	if err := json.Unmarshal(data, &resp); err != nil {
-
-		// Fallback: maybe it returns { isMore, book: { list: [...] }, page_info } like TabData?
-		var tabDataResp models.TabDataResponse
-		if err2 := json.Unmarshal(data, &tabDataResp); err2 == nil {
-			return &models.TabFeedResponse{
-				IsMore:   tabDataResp.IsMore,
-				Book:     tabDataResp.Book.List,
-				PageInfo: tabDataResp.PageInfo,
-			}, nil
+	if err := json.Unmarshal(data, &resp); err == nil {
+		// Validate that we have the expected data
+		if len(resp.Book) > 0 || resp.PageInfo.HasMore {
+			return &resp, nil
 		}
-		return nil, err
 	}
-	return &resp, nil
+
+	// Fallback: try parsing as TabDataResponse (object with list format)
+	var tabDataResp models.TabDataResponse
+	if err2 := json.Unmarshal(data, &tabDataResp); err2 == nil {
+		return &models.TabFeedResponse{
+			IsMore:   tabDataResp.IsMore,
+			Book:     tabDataResp.Book.List,
+			PageInfo: tabDataResp.PageInfo,
+		}, nil
+	}
+
+	// Final fallback: try to parse as just an array of DramaItems
+	var dramaList []models.DramaItem
+	if err3 := json.Unmarshal(data, &dramaList); err3 == nil {
+		return &models.TabFeedResponse{
+			IsMore:   false,
+			Book:     dramaList,
+			PageInfo: pageInfo,
+		}, nil
+	}
+
+	return nil, fmt.Errorf("failed to parse TabFeed response: %v. Data: %s", err, string(data))
 }
 
 func (c *WrapperClient) GetSeriesDetail(id string, quality int) (*models.SeriesDetailResponse, error) {
